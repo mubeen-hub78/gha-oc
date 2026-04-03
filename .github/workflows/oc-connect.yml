@@ -1,0 +1,30 @@
+name: Test OpenShift Connection
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install oc CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+          tar -xvf oc.tar.gz
+          sudo mv oc /usr/local/bin
+
+      - name: Login to OpenShift
+        run: |
+          oc login ${{ secrets.OPENSHIFT_SERVER }} \
+          --token=${{ secrets.OPENSHIFT_TOKEN }} \
+          --insecure-skip-tls-verify=true
+
+      - name: Switch Project
+        run: |
+          oc project ${{ secrets.OPENSHIFT_NAMESPACE }}
+
+      - name: Verify Connection
+        run: |
+          oc get pods
