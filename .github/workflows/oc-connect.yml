@@ -31,6 +31,7 @@ jobs:
       - name: Deploy Pod
         run: |
           oc project ${{ secrets.OPENSHIFT_NAMESPACE }}
+          oc delete pod nginx-test --ignore-not-found=true
           oc apply -f k8s/pod.yaml
 
       # 🔹 Step 5: Verify
