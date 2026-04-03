@@ -8,3 +8,11 @@ spec:
     image: nginx
     ports:
     - containerPort: 80
+    securityContext:
+      runAsUser: 1001
+    volumeMounts:
+    - name: cache-volume
+      mountPath: /var/cache/nginx
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
