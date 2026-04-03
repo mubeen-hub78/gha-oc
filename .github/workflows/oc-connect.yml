@@ -1,35 +1,39 @@
-name: Test OpenShift Connection
+name: Deploy to OpenShift
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  test-connection:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 🔹 Step 1: Checkout repo (MANDATORY)
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 🔹 Step 2: Install oc CLI
       - name: Install oc CLI
         run: |
           curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
           tar -xvf oc.tar.gz
           sudo mv oc /usr/local/bin
 
+      # 🔹 Step 3: Login to OpenShift
       - name: Login to OpenShift
         run: |
           oc login ${{ secrets.OPENSHIFT_SERVER }} \
           --token=${{ secrets.OPENSHIFT_TOKEN }} \
           --insecure-skip-tls-verify=true
 
-      - name: Switch Project
-        run: |
-          oc project ${{ secrets.OPENSHIFT_NAMESPACE }}
-
-      - name: Verify Connection
-        run: |
-          oc get pods
-          
+      # 🔹 Step 4: Deploy Pod
       - name: Deploy Pod
         run: |
           oc project ${{ secrets.OPENSHIFT_NAMESPACE }}
           oc apply -f k8s/pod.yaml
+
+      # 🔹 Step 5: Verify
+      - name: Verify Deployment
+        run: |
+          oc get pods
